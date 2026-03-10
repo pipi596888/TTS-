@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Voice } from '@/types/voice'
 import { voiceApi } from '@/api/voice'
@@ -6,14 +6,17 @@ import { voiceApi } from '@/api/voice'
 export const useVoiceStore = defineStore('voice', () => {
   const voiceList = ref<Voice[]>([])
   const loading = ref(false)
+  const error = ref<string>('')
 
   async function fetchVoiceList() {
     loading.value = true
+    error.value = ''
     try {
       const res = await voiceApi.list()
-      voiceList.value = res.data.list
-    } catch (error) {
-      console.error('Failed to fetch voice list:', error)
+      voiceList.value = res?.list || []
+    } catch (err: any) {
+      console.error('Failed to fetch voice list:', err)
+      error.value = err.message || '获取音色列表失败'
     } finally {
       loading.value = false
     }
@@ -21,8 +24,8 @@ export const useVoiceStore = defineStore('voice', () => {
 
   async function createVoice(params: { name: string; tone: string; gender: string }) {
     const res = await voiceApi.create(params)
-    voiceList.value.push(res.data)
-    return res.data
+    voiceList.value.push(res)
+    return res
   }
 
   async function deleteVoice(id: number) {
@@ -49,6 +52,7 @@ export const useVoiceStore = defineStore('voice', () => {
   return {
     voiceList,
     loading,
+    error,
     fetchVoiceList,
     createVoice,
     deleteVoice,
@@ -57,3 +61,4 @@ export const useVoiceStore = defineStore('voice', () => {
     getVoiceById,
   }
 })
+

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="role-panel">
     <div class="panel-header">
       <h3>音色列表</h3>
@@ -187,3 +187,4 @@ function handleAddRole() {
   opacity: 1;
 }
 </style>
+

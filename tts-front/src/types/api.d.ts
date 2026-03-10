@@ -1,4 +1,4 @@
-import type { Voice, VoiceCreateParams, VoiceListResponse } from './voice'
+﻿import type { Voice, VoiceCreateParams, VoiceListResponse } from './voice'
 import type { TTSGenerateParams, TTSGenerateResponse, TTSTaskResponse } from './tts'
 
 export interface User {
@@ -16,3 +16,4 @@ export interface ApiResponse<T = any> {
 
 export type { Voice, VoiceCreateParams, VoiceListResponse }
 export type { TTSGenerateParams, TTSGenerateResponse, TTSTaskResponse }
+

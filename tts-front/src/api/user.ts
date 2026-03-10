@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+﻿import { request } from '@/utils/request'
 import type { User } from '@/types/api'
 
 export interface LoginResponse {
@@ -30,3 +30,4 @@ export const userApi = {
     })
   },
 }
+

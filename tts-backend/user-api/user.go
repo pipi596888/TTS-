@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
@@ -23,22 +24,110 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
+	db, err := sql.Open("mysql", c.Mysql.DataSource)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	if err := ensureWorksSchema(db); err != nil {
+		panic(err)
+	}
+	if err := ensureAdminSchema(db); err != nil {
+		panic(err)
+	}
+
 	server.AddRoutes(
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
 				Path:    "/api/user/login",
-				Handler: loginHandler(&c),
+				Handler: loginHandler(&c, db),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/api/user/register",
-				Handler: registerHandler(&c),
+				Handler: registerHandler(&c, db),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/user/info",
+				Handler: requireAuth(&c, getUserInfoHandler(db)),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/api/works/list",
-				Handler: getWorksHandler(&c),
+				Handler: requireAuth(&c, getWorksHandler(db)),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/works/:taskId/title",
+				Handler: requireAuth(&c, updateWorkTitleHandler(db)),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/works/:taskId",
+				Handler: requireAuth(&c, deleteWorkHandler(db)),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/feedback",
+				Handler: requireAuth(&c, createFeedbackHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/feedback/my",
+				Handler: requireAuth(&c, listMyFeedbackHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/feedback/list",
+				Handler: requireAdmin(&c, db, listAllFeedbackHandler(db)),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/admin/feedback/:id/reply",
+				Handler: requireAdmin(&c, db, replyFeedbackHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/system/stats",
+				Handler: requireAdmin(&c, db, systemStatsHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/users",
+				Handler: requireAdmin(&c, db, listAdminUsersHandler(db)),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/admin/users",
+				Handler: requireAdmin(&c, db, createAdminUserHandler(db)),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/admin/users/:id",
+				Handler: requireAdmin(&c, db, updateAdminUserHandler(db)),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/admin/users/:id",
+				Handler: requireAdmin(&c, db, deleteAdminUserHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/roles",
+				Handler: requireAdmin(&c, db, listAdminRolesHandler(db)),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/logs",
+				Handler: requireAdmin(&c, db, listAdminLogsHandler(db)),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/admin/logs",
+				Handler: requireAdmin(&c, db, appendAdminLogHandler(db)),
 			},
 		},
 	)

@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+﻿import { request } from '@/utils/request'
 import type { Voice, VoiceCreateParams, VoiceListResponse } from '@/types/voice'
 
 export const voiceApi = {
@@ -31,3 +31,4 @@ export const voiceApi = {
     })
   },
 }
+

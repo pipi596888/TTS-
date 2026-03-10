@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 
+	"tts-backend/tts-api/internal/model"
 	"tts-backend/tts-api/internal/svc"
 	"tts-backend/tts-api/internal/types"
-	"tts-backend/tts-api/internal/model"
 )
 
 type GenerateLogic struct {
@@ -22,22 +22,20 @@ func NewGenerateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Generate
 	}
 }
 
-func (l *GenerateLogic) Generate(req *types.GenerateReq) (resp *types.GenerateResp, err error) {
+func (l *GenerateLogic) Generate(req *types.GenerateReq, userId int64) (resp *types.GenerateResp, err error) {
 	taskId := uuid.New().String()
-
-	userId := int64(1)
 	totalChars := 0
 	for _, seg := range req.Segments {
 		totalChars += len(seg.Text)
 	}
 
 	task := &model.TtsTask{
-		TaskId:  taskId,
-		UserId:  userId,
-		Status:  "pending",
+		TaskId:   taskId,
+		UserId:   userId,
+		Status:   "pending",
 		Progress: 0,
-		Format:  req.Format,
-		Channel: req.Channel,
+		Format:   req.Format,
+		Channel:  req.Channel,
 	}
 
 	_, err = l.svcCtx.TaskModel.Insert(task)

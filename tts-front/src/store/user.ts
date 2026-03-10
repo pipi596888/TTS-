@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+﻿import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { User } from '@/types/api'
 import { userApi } from '@/api/user'
@@ -10,7 +10,7 @@ export const useUserStore = defineStore('user', () => {
   async function fetchUserInfo() {
     try {
       const res = await userApi.getInfo()
-      userInfo.value = res.data
+      userInfo.value = res
     } catch (error) {
       console.error('Failed to fetch user info:', error)
     }
@@ -40,3 +40,4 @@ export const useUserStore = defineStore('user', () => {
     logout,
   }
 })
+

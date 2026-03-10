@@ -1,5 +1,10 @@
 node_modules/
 dist/
+.npm-cache/
+gocache/
+config.codex.toml
+--help
+.claude/settings.local.json
 *.exe
 *.exe~
 *.log

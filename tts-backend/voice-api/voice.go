@@ -48,6 +48,41 @@ func main() {
 				Path:    "/api/voice/default/:id",
 				Handler: handler.SetDefaultVoiceHandler(svcCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/voice/custom/request",
+				Handler: handler.CreateCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/voice/custom/list",
+				Handler: handler.ListMyCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/voice/custom/:id",
+				Handler: handler.DeleteCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/admin/voice/custom/list",
+				Handler: handler.AdminListCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/admin/voice/custom/:id/approve",
+				Handler: handler.AdminApproveCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/api/admin/voice/custom/:id/reject",
+				Handler: handler.AdminRejectCustomVoiceHandler(svcCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/api/admin/voice/custom/:id",
+				Handler: handler.AdminDeleteCustomVoiceHandler(svcCtx),
+			},
 		},
 	)
 

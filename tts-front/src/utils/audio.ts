@@ -1,10 +1,11 @@
-import { saveAs } from 'file-saver'
+﻿import { saveAs } from 'file-saver'
 
 export class AudioPlayer {
   private audio: HTMLAudioElement
   private _onTimeUpdate: ((time: number) => void) | null = null
   private _onEnded: (() => void) | null = null
   private _onError: ((error: Error) => void) | null = null
+  private _onDurationChange: ((duration: number) => void) | null = null
 
   constructor() {
     this.audio = new Audio()
@@ -12,9 +13,16 @@ export class AudioPlayer {
   }
 
   private setupListeners() {
+    const emitDuration = () => {
+      this._onDurationChange?.(this.audio.duration || 0)
+    }
+
     this.audio.addEventListener('timeupdate', () => {
       this._onTimeUpdate?.(this.audio.currentTime)
     })
+
+    this.audio.addEventListener('loadedmetadata', emitDuration)
+    this.audio.addEventListener('durationchange', emitDuration)
 
     this.audio.addEventListener('ended', () => {
       this._onEnded?.()
@@ -27,6 +35,7 @@ export class AudioPlayer {
 
   load(url: string) {
     this.audio.src = url
+    this.audio.currentTime = 0
     this.audio.load()
   }
 
@@ -75,12 +84,17 @@ export class AudioPlayer {
     this._onError = callback
   }
 
+  onDurationChange(callback: (duration: number) => void) {
+    this._onDurationChange = callback
+  }
+
   destroy() {
     this.audio.pause()
     this.audio.src = ''
     this._onTimeUpdate = null
     this._onEnded = null
     this._onError = null
+    this._onDurationChange = null
   }
 }
 
@@ -93,3 +107,4 @@ export async function downloadAudio(url: string, filename: string) {
     throw new Error('Download failed')
   }
 }
+

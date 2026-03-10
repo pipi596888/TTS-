@@ -3,9 +3,9 @@ package logic
 import (
 	"context"
 
+	"tts-backend/voice-api/internal/model"
 	"tts-backend/voice-api/internal/svc"
 	"tts-backend/voice-api/internal/types"
-	"tts-backend/voice-api/internal/model"
 )
 
 type CreateVoiceLogic struct {

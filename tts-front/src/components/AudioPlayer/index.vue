@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="audio-player">
     <div class="player-controls">
       <el-button
@@ -38,6 +38,7 @@ import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
   audioUrl?: string
+  filename?: string
 }>()
 
 const player = ref<AudioPlayerClass | null>(null)
@@ -51,7 +52,8 @@ watch(
   (url) => {
     if (url && player.value) {
       player.value.load(url)
-      duration.value = player.value.duration
+      isPlaying.value = false
+      currentTime.value = 0
     }
   }
 )
@@ -61,6 +63,9 @@ onMounted(() => {
   if (player.value) {
     player.value.onTimeUpdate((time) => {
       currentTime.value = time
+    })
+    player.value.onDurationChange((d) => {
+      duration.value = d
     })
     player.value.onEnded(() => {
       isPlaying.value = false
@@ -84,8 +89,15 @@ function togglePlay() {
     player.value.pause()
     isPlaying.value = false
   } else {
-    player.value.play()
-    isPlaying.value = true
+    player.value
+      .play()
+      .then(() => {
+        isPlaying.value = true
+      })
+      .catch((err) => {
+        ElMessage.error(err?.message || '无法播放音频')
+        isPlaying.value = false
+      })
   }
 }
 
@@ -103,11 +115,22 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
+function guessExtFromUrl(url: string): string {
+  try {
+    const u = new URL(url, window.location.href)
+    const m = u.pathname.match(/\.([a-zA-Z0-9]{2,5})$/)
+    return m?.[1]?.toLowerCase() || 'mp3'
+  } catch {
+    const m = url.match(/\.([a-zA-Z0-9]{2,5})(?:\?|#|$)/)
+    return m?.[1]?.toLowerCase() || 'mp3'
+  }
+}
+
 async function handleDownload() {
   if (!props.audioUrl) return
   try {
-    const filename = `audio_${Date.now()}.mp3`
-    await downloadAudio(props.audioUrl, filename)
+    const name = props.filename || `audio_${Date.now()}.${guessExtFromUrl(props.audioUrl)}`
+    await downloadAudio(props.audioUrl, name)
     ElMessage.success('下载成功')
   } catch {
     ElMessage.error('下载失败')
@@ -147,3 +170,4 @@ async function handleDownload() {
   gap: 8px;
 }
 </style>
+

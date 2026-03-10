@@ -1,4 +1,4 @@
-export interface Segment {
+﻿export interface Segment {
   id: string
   voiceId: number
   emotion?: string
@@ -6,7 +6,7 @@ export interface Segment {
   order: number
 }
 
-export type AudioFormat = 'mp3' | 'wav' | 'flac'
+export type AudioFormat = 'mp3' | 'wav' | 'flac' | 'pcm'
 export type AudioChannel = 'mono' | 'stereo'
 export type TaskStatus = 'pending' | 'processing' | 'success' | 'failed'
 
@@ -38,3 +38,4 @@ export interface TTSState {
   format: AudioFormat
   channel: AudioChannel
 }
+

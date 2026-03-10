@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="generate-panel">
     <div class="panel-header">
       <h3>生成设置</h3>
@@ -10,6 +10,7 @@
           <el-option label="MP3" value="mp3" />
           <el-option label="WAV" value="wav" />
           <el-option label="FLAC" value="flac" />
+          <el-option label="PCM" value="pcm" />
         </el-select>
       </div>
       <div class="setting-item">
@@ -139,3 +140,4 @@ function handleClear() {
   margin-top: 8px;
 }
 </style>
+

@@ -16,4 +16,5 @@ type Config struct {
 	RabbitMQ struct {
 		Address string
 	}
+	JwtSecret string
 }

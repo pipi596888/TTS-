@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="voice-selector">
     <el-select
       v-model="selectedId"
@@ -72,3 +72,4 @@ function handlePreview() {
   gap: 8px;
 }
 </style>
+

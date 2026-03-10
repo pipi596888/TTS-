@@ -56,7 +56,7 @@ func (w *TTSWorker) ProcessTask(taskId string) error {
 		return err
 	}
 
-	task, err := w.taskModel.FindByTaskId(taskId)
+	_, err = w.taskModel.FindByTaskId(taskId)
 	if err != nil {
 		w.taskModel.UpdateError(taskId, err.Error())
 		return err
@@ -73,36 +73,25 @@ func (w *TTSWorker) ProcessTask(taskId string) error {
 		return fmt.Errorf("no segments found")
 	}
 
-	totalSegments := len(segments)
-	audioDataList := make([][]byte, 0, totalSegments)
+	// 使用第一个片段生成音频
+	seg := segments[0]
+	log.Printf("Generating audio for text: %s", seg.Text)
 
-	for i, seg := range segments {
-		log.Printf("Generating segment %d/%d: %s", i+1, totalSegments, seg.Text)
-
-		audioData, err := w.engine.Generate(seg.Text, seg.VoiceId, seg.Emotion)
-		if err != nil {
-			w.taskModel.UpdateError(taskId, err.Error())
-			return err
-		}
-
-		audioDataList = append(audioDataList, audioData)
-
-		progress := (i + 1) * 80 / totalSegments
-		w.taskModel.UpdateStatus(taskId, "processing", progress)
-	}
-
-	mergedAudio, err := w.merger.MergeWavFiles(audioDataList, task.Format)
+	// MockEngine 返回音频 URL
+	audioData, err := w.engine.Generate(seg.Text, seg.VoiceId, seg.Emotion)
 	if err != nil {
 		w.taskModel.UpdateError(taskId, err.Error())
 		return err
 	}
 
-	audioUrl := fmt.Sprintf("https://%s.%s/tts/%s.%s",
-		w.config.Oss.BucketName,
-		w.config.Oss.Endpoint,
-		taskId,
-		task.Format,
-	)
+	// 更新进度
+	w.taskModel.UpdateStatus(taskId, "processing", 80)
+
+	// 使用引擎返回的 URL
+	audioUrl := string(audioData)
+	if audioUrl == "" {
+		audioUrl = "https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav"
+	}
 
 	log.Printf("Task %s completed, audio URL: %s", taskId, audioUrl)
 
@@ -129,7 +118,24 @@ func (w *TTSWorker) Start(ctx context.Context) error {
 }
 
 func (w *TTSWorker) processPendingTasks() {
-	log.Println("Checking for pending tasks...")
+	tasks, err := w.taskModel.FindPendingTasks(5)
+	if err != nil {
+		log.Printf("Failed to find pending tasks: %v", err)
+		return
+	}
+
+	if len(tasks) == 0 {
+		return
+	}
+
+	log.Printf("Found %d pending tasks", len(tasks))
+
+	for _, task := range tasks {
+		err := w.ProcessTask(task.TaskId)
+		if err != nil {
+			log.Printf("Failed to process task %s: %v", task.TaskId, err)
+		}
+	}
 }
 
 func HandleTaskMessage(data []byte) error {

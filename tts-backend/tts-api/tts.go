@@ -38,6 +38,11 @@ func main() {
 				Path:    "/api/tts/task/:taskId",
 				Handler: handler.QueryTaskHandler(svcCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/api/tts/task/:taskId/detail",
+				Handler: handler.QueryTaskDetailHandler(svcCtx),
+			},
 		},
 	)
 

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/go-sql-driver/mysql"
 	"tts-backend/tts-worker/internal/config"
 	"tts-backend/tts-worker/internal/worker"
 

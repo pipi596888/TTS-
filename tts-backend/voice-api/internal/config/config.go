@@ -13,4 +13,5 @@ type Config struct {
 		Address  string
 		Password string
 	}
+	JwtSecret string
 }

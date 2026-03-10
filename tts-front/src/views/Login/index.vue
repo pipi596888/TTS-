@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="login-page">
     <!-- 全屏背景 -->
     <div class="bg-layer"></div>
@@ -591,3 +591,4 @@ if (savedUsername) {
   transform: translateX(-20px);
 }
 </style>
+

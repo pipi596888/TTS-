@@ -6,7 +6,14 @@
     },
     "dbhub": {
       "command": "npx",
-      "args": ["dbhub-mcp", "--url", "http://localhost:8080/mcp"]
+      "args": ["--yes", "dbhub-mcp", "--url", "http://localhost:8080/mcp"],
+      "env": {
+        "npm_config_cache": ".npm-cache",
+        "npm_config_update_notifier": "false"
+      }
+    },
+    "mcp-chrome": {
+      "url": "http://127.0.0.1:12306/mcp"
     }
   }
 }

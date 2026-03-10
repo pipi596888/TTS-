@@ -9,8 +9,9 @@ import (
 )
 
 type ServiceContext struct {
-	Config    *config.Config
-	VoiceModel model.VoiceModel
+	Config                  *config.Config
+	VoiceModel              model.VoiceModel
+	CustomVoiceRequestModel model.CustomVoiceRequestModel
 }
 
 func NewServiceContext(c *config.Config) *ServiceContext {
@@ -20,7 +21,8 @@ func NewServiceContext(c *config.Config) *ServiceContext {
 	}
 
 	return &ServiceContext{
-		Config:    c,
-		VoiceModel: model.NewVoiceModel(db),
+		Config:                  c,
+		VoiceModel:              model.NewVoiceModel(db),
+		CustomVoiceRequestModel: model.NewCustomVoiceRequestModel(db),
 	}
 }

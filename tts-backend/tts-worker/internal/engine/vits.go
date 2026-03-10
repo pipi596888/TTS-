@@ -56,7 +56,19 @@ func NewMockEngine() *MockEngine {
 }
 
 func (e *MockEngine) Generate(text string, voiceId int64, emotion string) ([]byte, error) {
-	return []byte("mock audio data"), nil
+	// 使用在线示例音频作为模拟输出
+	// 实际生产环境应替换为真实的 TTS API 调用
+	sampleAudioUrls := []string{
+		"https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav",
+		"https://www2.cs.uic.edu/~i101/SoundFiles/StarWars3.wav",
+		"https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav",
+	}
+
+	// 根据 voiceId 选择不同的示例音频
+	url := sampleAudioUrls[voiceId%3]
+
+	// 返回 URL 作为模拟数据
+	return []byte(url), nil
 }
 
 func (e *MockEngine) GetVoiceName(voiceId int64) string {

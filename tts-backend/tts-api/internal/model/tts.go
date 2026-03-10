@@ -7,25 +7,27 @@ import (
 )
 
 type TtsTask struct {
-	Id         int64     `json:"id"`
-	TaskId     string    `json:"taskId"`
-	UserId     int64     `json:"userId"`
-	Status     string    `json:"status"`
-	Progress   int       `json:"progress"`
-	AudioUrl   string    `json:"audioUrl"`
-	Format     string    `json:"format"`
-	Channel    string    `json:"channel"`
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
+	Id        int64          `json:"id"`
+	TaskId    string         `json:"taskId"`
+	Title     string         `json:"title"`
+	UserId    int64          `json:"userId"`
+	Status    string         `json:"status"`
+	Progress  int            `json:"progress"`
+	AudioUrl  sql.NullString `json:"audioUrl"`
+	Format    string         `json:"format"`
+	Channel   string         `json:"channel"`
+	ErrorMsg  sql.NullString `json:"errorMsg"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
 }
 
 type TtsSegment struct {
-	Id       int64  `json:"id"`
-	TaskId   string `json:"taskId"`
-	VoiceId  int64  `json:"voiceId"`
-	Emotion  string `json:"emotion"`
-	Text     string `json:"text"`
-	Sort     int    `json:"sort"`
+	Id      int64  `json:"id"`
+	TaskId  string `json:"taskId"`
+	VoiceId int64  `json:"voiceId"`
+	Emotion string `json:"emotion"`
+	Text    string `json:"text"`
+	Sort    int    `json:"sort"`
 }
 
 type TtsTaskModel interface {
@@ -59,11 +61,11 @@ func (m *DefaultTtsTaskModel) Insert(task *TtsTask) (int64, error) {
 }
 
 func (m *DefaultTtsTaskModel) FindByTaskId(taskId string) (*TtsTask, error) {
-	query := `SELECT id, task_id, user_id, status, progress, audio_url, format, channel, created_at, updated_at FROM tts_task WHERE task_id = ?`
+	query := `SELECT id, task_id, COALESCE(title,''), user_id, status, progress, audio_url, format, channel, error_msg, created_at, updated_at FROM tts_task WHERE task_id = ?`
 	var task TtsTask
 	err := m.db.QueryRow(query, taskId).Scan(
-		&task.Id, &task.TaskId, &task.UserId, &task.Status,
-		&task.Progress, &task.AudioUrl, &task.Format, &task.Channel,
+		&task.Id, &task.TaskId, &task.Title, &task.UserId, &task.Status,
+		&task.Progress, &task.AudioUrl, &task.Format, &task.Channel, &task.ErrorMsg,
 		&task.CreatedAt, &task.UpdatedAt,
 	)
 	if err != nil {

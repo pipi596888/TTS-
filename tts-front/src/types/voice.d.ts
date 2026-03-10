@@ -1,4 +1,4 @@
-export interface Voice {
+﻿export interface Voice {
   id: number
   name: string
   tone: string
@@ -17,3 +17,4 @@ export interface VoiceListResponse {
   list: Voice[]
   total: number
 }
+

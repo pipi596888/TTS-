@@ -6,16 +6,16 @@ import (
 )
 
 type TtsTask struct {
-	Id         int64     `json:"id"`
-	TaskId     string    `json:"taskId"`
-	UserId     int64     `json:"userId"`
-	Status     string    `json:"status"`
-	Progress   int       `json:"progress"`
-	AudioUrl   string    `json:"audioUrl"`
-	Format     string    `json:"format"`
-	Channel    string    `json:"channel"`
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
+	Id         int64          `json:"id"`
+	TaskId     string         `json:"taskId"`
+	UserId     int64          `json:"userId"`
+	Status     string         `json:"status"`
+	Progress   int            `json:"progress"`
+	AudioUrl   sql.NullString `json:"audioUrl"`
+	Format     string         `json:"format"`
+	Channel    string         `json:"channel"`
+	CreatedAt  time.Time      `json:"createdAt"`
+	UpdatedAt  time.Time      `json:"updatedAt"`
 }
 
 type TtsSegment struct {
@@ -29,6 +29,7 @@ type TtsSegment struct {
 
 type TtsTaskModel interface {
 	FindByTaskId(taskId string) (*TtsTask, error)
+	FindPendingTasks(limit int) ([]*TtsTask, error)
 	UpdateStatus(taskId string, status string, progress int) error
 	UpdateAudioUrl(taskId string, audioUrl string) error
 	UpdateError(taskId string, errMsg string) error
@@ -58,6 +59,30 @@ func (m *DefaultTtsTaskModel) FindByTaskId(taskId string) (*TtsTask, error) {
 		return nil, err
 	}
 	return &task, nil
+}
+
+func (m *DefaultTtsTaskModel) FindPendingTasks(limit int) ([]*TtsTask, error) {
+	query := `SELECT id, task_id, user_id, status, progress, audio_url, format, channel, created_at, updated_at FROM tts_task WHERE status = 'pending' ORDER BY created_at ASC LIMIT ?`
+	rows, err := m.db.Query(query, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []*TtsTask
+	for rows.Next() {
+		var task TtsTask
+		err := rows.Scan(
+			&task.Id, &task.TaskId, &task.UserId, &task.Status,
+			&task.Progress, &task.AudioUrl, &task.Format, &task.Channel,
+			&task.CreatedAt, &task.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, &task)
+	}
+	return tasks, nil
 }
 
 func (m *DefaultTtsTaskModel) UpdateStatus(taskId string, status string, progress int) error {

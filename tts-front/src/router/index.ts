@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +30,24 @@ const router = createRouter({
       component: () => import('@/views/VoiceManage/index.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/custom-voice',
+      name: 'CustomVoice',
+      component: () => import('@/views/CustomVoice/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/feedback',
+      name: 'Feedback',
+      component: () => import('@/views/Feedback/index.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/system',
+      name: 'SystemManage',
+      component: () => import('@/views/SystemManage/index.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
@@ -37,7 +55,7 @@ function getToken() {
   return localStorage.getItem('token')
 }
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const token = getToken()
   
   if (to.meta.requiresAuth && !token) {
@@ -50,3 +68,4 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
+

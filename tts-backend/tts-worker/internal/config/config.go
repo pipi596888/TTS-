@@ -1,9 +1,5 @@
 package config
 
-import (
-	"github.com/zeromicro/go-zero/zrpc"
-)
-
 type Config struct {
 	Mysql struct {
 		DataSource string
