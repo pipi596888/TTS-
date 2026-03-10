@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -15,16 +15,21 @@ function handleLogout() {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
-  }).then(() => {
-    userStore.logout()
-    router.push('/login')
-  }).catch(() => {})
+  })
+    .then(() => {
+      userStore.logout()
+      router.push('/login')
+    })
+    .catch(() => {})
 }
 
 onMounted(() => {
   const token = localStorage.getItem('token')
   if (token && !userStore.token) {
     userStore.setToken(token)
+  }
+  if (token && !userStore.userInfo) {
+    userStore.fetchUserInfo()
   }
 })
 </script>
@@ -36,26 +41,30 @@ onMounted(() => {
         <div class="header-left">
           <div class="logo">
             <svg viewBox="0 0 24 24" width="20" height="20">
-              <path fill="currentColor" d="M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-3a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v3a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"/>
+              <path
+                fill="currentColor"
+                d="M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-3a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v3a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"
+              />
             </svg>
           </div>
           <h1>TTS 语音合成系统</h1>
         </div>
-        <el-menu 
-          mode="horizontal" 
-          :router="true" 
-          :default-active="route.path"
-          class="main-menu"
-        >
+
+        <el-menu mode="horizontal" :router="true" :ellipsis="false" :default-active="route.path" class="main-menu">
           <el-menu-item index="/generate">生成音频</el-menu-item>
           <el-menu-item index="/works">我的作品</el-menu-item>
           <el-menu-item index="/voice">音色管理</el-menu-item>
+          <el-menu-item index="/custom-voice">定制声音</el-menu-item>
+          <el-menu-item index="/feedback">建议反馈</el-menu-item>
+          <el-menu-item index="/system">系统管理</el-menu-item>
         </el-menu>
+
         <div class="header-right">
           <span class="username">{{ userStore.userInfo?.username || '用户' }}</span>
           <el-button size="small" @click="handleLogout">退出</el-button>
         </div>
       </el-header>
+
       <el-main class="main-content">
         <RouterView />
       </el-main>
@@ -70,7 +79,8 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -130,6 +140,7 @@ html, body {
   font-size: 15px;
 }
 
+
 .header-right {
   display: flex;
   align-items: center;
@@ -142,7 +153,7 @@ html, body {
 }
 
 .main-content {
-  padding: 20px;
+  padding: 0;
   height: calc(100vh - 64px);
   overflow: hidden;
   display: flex;
@@ -152,7 +163,37 @@ html, body {
 .main-content > * {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 980px) {
+  .main-header {
+    padding: 0 12px;
+  }
+
+  .header-left {
+    margin-right: 16px;
+    gap: 10px;
+  }
+
+  .header-left h1 {
+    display: none;
+  }
+
+  .main-menu {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .main-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-right .username {
+    display: none;
+  }
 }
 </style>
+
+
